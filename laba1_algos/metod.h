@@ -22,3 +22,9 @@ void solveExact(const Matrix& matrix, int start,
     long long& count);
 
 void printRoute(const std::vector<int>& order, int start);
+
+long long solveGreedy(const Matrix& matrix, int start,
+    std::vector<int>& route);
+
+double solutionQuality(long long minCost, long long maxCost,
+    long long greedyCost);

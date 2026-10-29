@@ -18,19 +18,25 @@ int main()
 
     std::vector<int> minRoute;
     std::vector<int> maxRoute;
+    std::vector<int> greedyRoute;
 
     solveExact(matrix, start, minCost, maxCost,
         minRoute, maxRoute, count);
 
-    printMatrix(matrix);
+    long long greedyCost = solveGreedy(matrix, start, greedyRoute);
 
-    std::cout << "\nMinimum: " << minCost << '\n';
+    std::cout << "Minimum: " << minCost << '\n';
     printRoute(minRoute, start);
 
     std::cout << "Maximum: " << maxCost << '\n';
     printRoute(maxRoute, start);
 
-    std::cout << "Routes checked: " << count << '\n';
+    std::cout << "Greedy: " << greedyCost << '\n';
+    printRoute(greedyRoute, start);
+
+    std::cout << "Quality: "
+        << solutionQuality(minCost, maxCost, greedyCost)
+        << "%\n";
 
     return 0;
 }

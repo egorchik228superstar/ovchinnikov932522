@@ -129,3 +129,51 @@ void printRoute(const std::vector<int>& order, int start)
 
     std::cout << " -> " << start + 1 << '\n';
 }
+
+long long solveGreedy(const Matrix& matrix, int start,
+    std::vector<int>& route)
+{
+    int n = static_cast<int>(matrix.size());
+    std::vector<bool> visited(n, false);
+
+    route.clear();
+
+    long long cost = 0;
+    int current = start;
+    visited[start] = true;
+
+    for (int step = 1; step < n; ++step)
+    {
+        int nearest = -1;
+
+        for (int city = 0; city < n; ++city)
+        {
+            if (!visited[city])
+            {
+                if (nearest == -1 ||
+                    matrix[current][city] < matrix[current][nearest])
+                {
+                    nearest = city;
+                }
+            }
+        }
+
+        cost += matrix[current][nearest];
+        route.push_back(nearest);
+        visited[nearest] = true;
+        current = nearest;
+    }
+
+    cost += matrix[current][start];
+
+    return cost;
+}
+
+double solutionQuality(long long minCost, long long maxCost,
+    long long greedyCost)
+{
+    if (minCost == maxCost)
+        return 100.0;
+
+    return 100.0 * (maxCost - greedyCost) / (maxCost - minCost);
+}
