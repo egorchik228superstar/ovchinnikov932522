@@ -1,42 +1,64 @@
 #include "metod.h"
 #include <iostream>
+#include <clocale>
 
 int main()
 {
-    Matrix matrix = {
-        { 0, 10, 5, 17 },
-        { 6, 0, 1, 1 },
-        { 9, 10, 0, 4 },
-        { 16, 3, 7, 0 }
-    };
+    setlocale(LC_ALL, "");
 
-    int start = 0;
+    std::cout << std::fixed;
+    std::cout.precision(6);
 
-    long long minCost = 0;
-    long long maxCost = 0;
-    long long count = 0;
+    std::cout << "1 - Пример из лекции\n";
+    std::cout << "2 - Сравнение точного алгоритма и эвристики\n";
+    std::cout << "3 - Исследование роста времени перебора\n";
+    std::cout << "Выберите режим: ";
 
-    std::vector<int> minRoute;
-    std::vector<int> maxRoute;
-    std::vector<int> greedyRoute;
+    int mode;
 
-    solveExact(matrix, start, minCost, maxCost,
-        minRoute, maxRoute, count);
+    if (!(std::cin >> mode))
+    {
+        std::cout << "Ошибка ввода.\n";
+        return 1;
+    }
 
-    long long greedyCost = solveGreedy(matrix, start, greedyRoute);
+    if (mode == 1)
+    {
+        Matrix matrix = {
+            { 0, 10, 5, 17 },
+            { 6, 0, 1, 1 },
+            { 9, 10, 0, 4 },
+            { 16, 3, 7, 0 }
+        };
 
-    std::cout << "Minimum: " << minCost << '\n';
-    printRoute(minRoute, start);
+        int start;
 
-    std::cout << "Maximum: " << maxCost << '\n';
-    printRoute(maxRoute, start);
+        std::cout << "Введите начальный город (от 1 до 4): ";
 
-    std::cout << "Greedy: " << greedyCost << '\n';
-    printRoute(greedyRoute, start);
+        if (!(std::cin >> start) || start < 1 || start > 4)
+        {
+            std::cout << "Некорректный номер начального города.\n";
+            return 1;
+        }
 
-    std::cout << "Quality: "
-        << solutionQuality(minCost, maxCost, greedyCost)
-        << "%\n";
+        std::cout << "\nМатрица стоимостей:\n";
+        printMatrix(matrix);
+
+        runExperiment(matrix, start - 1, 1);
+    }
+    else if (mode == 2)
+    {
+        runExperiments();
+    }
+    else if (mode == 3)
+    {
+        runGrowthExperiment();
+    }
+    else
+    {
+        std::cout << "Такого режима нет.\n";
+        return 1;
+    }
 
     return 0;
 }

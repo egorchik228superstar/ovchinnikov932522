@@ -28,3 +28,9 @@ long long solveGreedy(const Matrix& matrix, int start,
 
 double solutionQuality(long long minCost, long long maxCost,
     long long greedyCost);
+
+void runExperiment(const Matrix& matrix, int start, int test);
+
+void runExperiments();
+
+void runGrowthExperiment();

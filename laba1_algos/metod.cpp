@@ -1,5 +1,6 @@
 #include "metod.h"
 #include <iostream>
+#include <chrono>
 
 Matrix createMatrix(int n, int low, int high,
     std::mt19937& generator)
@@ -176,4 +177,122 @@ double solutionQuality(long long minCost, long long maxCost,
         return 100.0;
 
     return 100.0 * (maxCost - greedyCost) / (maxCost - minCost);
+}
+
+void runExperiment(const Matrix& matrix, int start, int test)
+{
+    long long minCost = 0;
+    long long maxCost = 0;
+    long long count = 0;
+
+    std::vector<int> minRoute;
+    std::vector<int> maxRoute;
+    std::vector<int> greedyRoute;
+
+    auto begin = std::chrono::steady_clock::now();
+
+    solveExact(matrix, start, minCost, maxCost,
+        minRoute, maxRoute, count);
+
+    auto end = std::chrono::steady_clock::now();
+
+    double exactTime =
+        std::chrono::duration<double, std::milli>(end - begin).count();
+
+    begin = std::chrono::steady_clock::now();
+
+    long long greedyCost = solveGreedy(matrix, start, greedyRoute);
+
+    end = std::chrono::steady_clock::now();
+
+    double greedyTime =
+        std::chrono::duration<double, std::milli>(end - begin).count();
+
+    std::cout << "\nRun #" << test << '\n';
+
+    std::cout << "Exact  | Min: " << minCost
+        << " | Max: " << maxCost
+        << " | Time: " << exactTime << " ms\n";
+
+    std::cout << "Greedy | Cost: " << greedyCost
+        << " | Time: " << greedyTime << " ms\n";
+
+    std::cout << "Quality: "
+        << solutionQuality(minCost, maxCost, greedyCost)
+        << "%\n";
+
+    std::cout << "Best route: ";
+    printRoute(minRoute, start);
+
+    std::cout << "Worst route: ";
+    printRoute(maxRoute, start);
+
+    std::cout << "Greedy route: ";
+    printRoute(greedyRoute, start);
+
+    std::cout << "Routes checked: " << count << '\n';
+}
+
+void runExperiments()
+{
+    std::mt19937 generator(42);
+    std::vector<int> sizes = { 4, 6, 8, 10 };
+
+    int low = 10;
+    int high = 100;
+    int start = 0;
+
+    for (int n : sizes)
+    {
+        std::cout << "\n========================================\n";
+        std::cout << "N = " << n
+            << " | Costs: " << low << ".." << high
+            << " | Start: " << start + 1 << '\n';
+        std::cout << "========================================\n";
+
+        for (int test = 1; test <= 4; ++test)
+        {
+            Matrix matrix = createMatrix(n, low, high, generator);
+            runExperiment(matrix, start, test);
+        }
+    }
+}
+
+void runGrowthExperiment()
+{
+    std::mt19937 generator(123);
+
+    std::cout << "\nCosts: 10..100 | Start: 1\n";
+    std::cout << "N\tRoutes\tTime_ms\n";
+
+    for (int n = 4; n <= 13; ++n)
+    {
+        Matrix matrix = createMatrix(n, 10, 100, generator);
+
+        long long minCost = 0;
+        long long maxCost = 0;
+        long long count = 0;
+
+        std::vector<int> minRoute;
+        std::vector<int> maxRoute;
+
+        auto begin = std::chrono::steady_clock::now();
+
+        solveExact(matrix, 0, minCost, maxCost,
+            minRoute, maxRoute, count);
+
+        auto end = std::chrono::steady_clock::now();
+
+        double time =
+            std::chrono::duration<double, std::milli>(end - begin).count();
+
+        std::cout << n << '\t' << count << '\t' << time << '\n';
+
+        // Следующий размер не запускаем, если текущий занял более 5 секунд.
+        if (time >= 5000.0)
+        {
+            std::cout << "Further growth stopped.\n";
+            break;
+        }
+    }
 }
